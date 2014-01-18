@@ -1,5 +1,6 @@
 ## ARM platform
 ### Files
+```
 ├── aeabi_ldivmod.s
 ├── aeabi_uldivmod.o
 ├── boot
@@ -17,8 +18,10 @@
 ├── main.o
 ├── Makefile
 └── README.md
+```
 
 ### Produced files
+```
 ├── aeabi_ldivmod.o
 └── boot
     ├── loader.o
@@ -30,6 +33,7 @@
     ├── core.o
     ├── floppy.elf
     └── floppy.img
+```
 
 ### Interrupts: `cpu/interrupt.rs`
 
