@@ -2,6 +2,9 @@ use core::mem::transmute;
 
 use platform::io;
 use cpu::Context;
+use cpu::idt;
+use kernel::heap;
+use kernel::memory::Allocator;
 
 #[repr(u8)]
 pub enum Fault {
@@ -66,6 +69,14 @@ pub unsafe fn exception_handler() -> extern "C" unsafe fn() {
 
     // Points to the data on the stack
     let stack_ptr = Context::save();
+
+    if stack_ptr.int_no as u8 == PageFault as u8 {
+        let mut value: u32;
+        asm!("mov %cr2, $0" : "=r"(value));
+        io::putx((value >> 8) as uint);
+        io::putc(' ' as u8);
+        io::putx(stack_ptr.call_stack.eip as uint);
+    }
 
     if stack_ptr.int_no as u8 == transmute(Breakpoint) {
         asm!("debug:" :::: "volatile")
