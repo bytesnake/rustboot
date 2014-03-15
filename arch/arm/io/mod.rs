@@ -8,6 +8,10 @@ pub unsafe fn write_word(c: u32) {
 }
 
 pub unsafe fn write_char(c: char) {
+    if c == '\r' {
+        *UART0 = '\x1b' as u32;
+        volatile_store(UART0, '\x1b' as u32);
+    }
     volatile_store(UART0, c as u32);
 }
 
