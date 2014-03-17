@@ -37,7 +37,7 @@ mod support;
 
 mod arch {
     #[cfg(target_arch = "x86")]
-    mod x86 {
+    pub mod x86 {
         pub mod cpu;
         pub mod io;
         pub mod drivers;
@@ -54,7 +54,7 @@ mod arch {
     }
 
     #[cfg(target_arch = "arm")]
-    mod arm {
+    pub mod arm {
         pub mod cpu;
         pub mod io;
         pub mod drivers;

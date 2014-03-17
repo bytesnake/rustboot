@@ -113,7 +113,7 @@ struct DtReg<T> {
 impl<T> DtReg<T> {
     pub fn new(descriptor_table: *mut T, capacity: uint) -> DtReg<T> {
         DtReg {
-            size: (capacity * size_of::<T>()) as u16,
+            size: (capacity * size_of::<T>() - 1) as u16,
             addr: descriptor_table,
         }
     }
