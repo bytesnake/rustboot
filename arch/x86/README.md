@@ -73,3 +73,9 @@ Since inline assembly has limitations, we build these entries dynamically. The C
 [7]: http://wiki.osdev.org/Exceptions "Exceptions - OSDev Wiki"
 [8]: http://www.srcf.ucam.org/piipkernel/git_repository/kernel/src/isr.asm
 [9]: http://www.xxeo.com/single-byte-or-small-x86-opcodes
+
+http://wiki.osdev.org/Getting_to_Ring_3
+http://eli.thegreenplace.net/2011/01/27/how-debuggers-work-part-2-breakpoints/
+http://pdos.csail.mit.edu/6.828/2005/readings/i386/PUSHA.htm
+http://www.win.tue.nl/~aeb/linux/lk/lk-4.html
+http://timetobleed.com/a-few-things-you-didnt-know-about-signals-in-linux-part-1/
