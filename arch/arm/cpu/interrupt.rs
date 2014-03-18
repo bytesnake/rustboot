@@ -1,6 +1,7 @@
 use core::mem::{volatile_store, transmute};
 use core::ptr::offset;
 
+use kernel;
 use platform::io;
 
 static VIC_INT_ENABLE: *mut u32 = (0x10140000 + 0x010) as *mut u32;
@@ -54,6 +55,7 @@ impl Table {
         self.enable(Reset, unsafe { transmute(start) });
         // breakpoints use an UND opcode to trigger UNDEF. [7]
         self.enable(Undef, debug);
+        self.enable(SWI, handler);
 
         unsafe {
             // Enable IRQs [5]
@@ -83,6 +85,10 @@ extern {
 #[no_mangle]
 pub unsafe fn debug() {
     asm!("movs pc, lr")
+}
+
+unsafe fn handler() {
+    kernel::syscall::handler(&mut kernel::syscall::args(0, 0, 0, 0));
 }
 
 /*
