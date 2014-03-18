@@ -1,5 +1,5 @@
 target remote localhost:1234
-symbol-file floppy/kernel.elf
+symbol-file boot/kernel.elf
 
 set disassembly-flavor intel
 
