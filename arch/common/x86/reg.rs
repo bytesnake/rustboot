@@ -23,7 +23,7 @@ macro_rules! impl_reg(
         pub struct $name;
 
         impl $name {
-            #[inline]
+            #[inline] #[allow(dead_code)]
             pub fn read() -> $T {
                 unsafe {
                     let flags;
@@ -32,7 +32,7 @@ macro_rules! impl_reg(
                 }
             }
 
-            #[inline]
+            #[inline] #[allow(dead_code)]
             pub fn write(f: $T) {
                 match f {
                     $T(val) => unsafe {
@@ -53,7 +53,7 @@ macro_rules! impl_reg(
         impl_reg!($name($reg): $flags)
 
         impl core::ops::BitOr<$flags, $flags> for CR0 {
-            #[inline(always)]
+            #[inline(always)] #[allow(dead_code)]
             fn bitor(&self, other: &$flags) -> $flags {
                 match ($name::read(), other) {
                     ($flags(lhsf), &$flags(rhsf)) => $flags(lhsf | rhsf)

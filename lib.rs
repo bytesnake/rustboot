@@ -44,6 +44,7 @@ mod arch {
         pub mod cpu;
         pub mod io;
         pub mod drivers;
+        #[allow(dead_code)]
         pub mod runtime;
     }
 

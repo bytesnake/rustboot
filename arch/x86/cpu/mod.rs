@@ -57,17 +57,6 @@ struct LocalSegment {
     ts: tss::TssEntry,
 }
 
-impl LocalSegment {
-    // FIXME: Rust needs address spaces
-    fn get() -> &mut LocalSegment {
-        unsafe {
-            let this: &mut LocalSegment;
-            asm!("mov $0, dword[gs:0]" : "=r"(this) ::: "volatile", "intel")
-            this
-        }
-    }
-}
-
 pub static mut desc_table: Option<gdt::Gdt> = None;
 
 pub fn init() {
