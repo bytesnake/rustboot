@@ -94,6 +94,31 @@ fn dmemset(s: *mut u8, c: u32, n: uint) {
     stosd(s, c, n);
 }
 
+pub fn sse2_dmem_movdqa_add(mut dest: *mut u8, c: u32, inc: u32, n: uint) {
+    unsafe {
+        // kernel::rt::breakpoint();
+        asm!("movd xmm0, $1 // xmm0 = start page
+              pshufd xmm0, xmm0, 0
+
+              movd xmm1, $0 // xmm1 = increment
+              paddd xmm0, xmm1
+              pshufd xmm1, xmm1, 0b11110000
+              paddd xmm0, xmm1
+              pshufd xmm1, xmm1, 0b11000000
+              paddd xmm0, xmm1
+              pshufd xmm0, xmm0, 0b00011011
+              pshufd xmm1, xmm1, 0
+              pslld xmm1, 2"
+            :: "r"(inc), "r"(c)
+            :: "intel")
+        range(0, n, |_| {
+            asm!("movdqa [$0], xmm0
+                  paddd xmm0, xmm1" :: "r"(dest) :: "intel")
+            dest = mut_offset(dest, 16);
+        });
+    }
+}
+
 #[no_mangle]
 pub fn memset(s: *mut u8, c: c_int, n: int) {
     memset_nonzero(s, (c & 0xFF) as u8, n as uint);
