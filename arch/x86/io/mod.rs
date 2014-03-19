@@ -9,6 +9,7 @@ static mut pos: int = 0;
 
 unsafe fn seek(offset: int) {
     pos += offset;
+    vga::cursor_at(pos as uint);
 }
 
 unsafe fn write_char(c: char) {
@@ -20,7 +21,7 @@ unsafe fn write_char(c: char) {
                 }
             }
             else if pos > 0 {
-                pos -= 1;
+                if pos > 0 { pos -= 1; }
                 (*vga::SCREEN)[pos].char = 0;
             }
         }
