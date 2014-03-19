@@ -1,6 +1,6 @@
 use core;
 
-use super::DtReg;
+use common::x86::reg;
 
 define_flags!(IdtFlags: u8 {
     INTR_GATE = 0b1110,
@@ -8,7 +8,7 @@ define_flags!(IdtFlags: u8 {
     PRESENT = 1 << 7
 })
 
-pub type IdtReg = DtReg<IdtEntry>;
+pub type IdtReg = reg::DtReg<IdtEntry>;
 
 #[packed]
 pub struct IdtEntry {
@@ -36,7 +36,7 @@ impl IdtEntry {
     }
 }
 
-impl super::DtReg<IdtEntry> {
+impl reg::DtReg<IdtEntry> {
     #[inline]
     pub fn load(&self) {
         unsafe {

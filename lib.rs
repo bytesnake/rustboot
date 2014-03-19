@@ -25,6 +25,7 @@ pub use platform::runtime::{memset, memcpy, memmove};
 pub use support::{memcpy, memmove};
 
 use platform::cpu;
+use arch::common;
 pub use kernel::util;
 
 mod macros;
@@ -36,6 +37,8 @@ pub mod kernel;
 mod support;
 
 mod arch {
+    pub mod common;
+
     #[cfg(target_arch = "x86")]
     pub mod x86 {
         pub mod cpu;

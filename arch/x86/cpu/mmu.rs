@@ -70,12 +70,12 @@ pub unsafe fn init() {
 }
 
 pub fn switch_directory(dir: Phys<PageDirectory>) {
-    use super::CR3;
-    CR3::write(dir.as_ptr());
+    use common::x86::reg::CR3;
+    CR3::write(Page::new(dir, Flags::zero()));
 }
 
 fn enable_paging() {
-    use super::{CR0, CR0_PG};
+    use common::x86::reg::{CR0, CR0_PG};
     CR0::write(CR0 | CR0_PG);
 }
 

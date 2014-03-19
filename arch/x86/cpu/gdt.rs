@@ -1,7 +1,7 @@
 use core::mem::{size_of, transmute};
 use core;
 
-use cpu::DtReg;
+use common::x86::reg;
 use util::ptr::mut_offset;
 use kernel::heap;
 
@@ -28,7 +28,7 @@ define_flags!(GdtFlags: u8 {
 
 pub static DATA_WRITE: GdtAccess = EXTEND;
 
-pub type GdtReg = DtReg<GdtEntry>;
+pub type GdtReg = reg::DtReg<GdtEntry>;
 
 #[packed]
 pub struct GdtEntry {
@@ -83,7 +83,7 @@ impl Gdt {
             let reg_ptr: *mut GdtReg = heap::alloc(1);
 
             let reg: &mut GdtReg = transmute(reg_ptr);
-            *reg = DtReg::new(table_ptr, 256);
+            *reg = reg::DtReg::new(table_ptr, 256);
 
             Gdt { reg: transmute(reg_ptr), table: table_ptr }
         }
@@ -114,7 +114,7 @@ impl Gdt {
     }
 }
 
-impl super::DtReg<GdtEntry> {
+impl reg::DtReg<GdtEntry> {
     #[inline]
     pub fn load(&self) {
         unsafe {

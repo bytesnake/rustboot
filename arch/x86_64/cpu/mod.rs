@@ -8,26 +8,6 @@ mod exception;
 pub mod mmu;
 pub mod io;
 
-define_flags!(Eflags: u64 {
-    CF,
-    IF = 1 << 9
-})
-
-impl Eflags {
-    #[inline]
-    fn read() -> Eflags {
-        unsafe {
-            let flags;
-            asm!("pushf; pop $0;" : "=r"(flags) ::: "volatile")
-            Eflags(flags)
-        }
-    }
-}
-
-define_flags!(CR0Flags: u64 {
-    CR0_PG = 1 << 31
-})
-
 // Extended Feature Enable Register
 define_flags!(EferFlags: u64 {
     EFER_SCE = 1 << 0,
@@ -62,22 +42,6 @@ impl core::ops::BitOr<EferFlags, EferFlags> for Efer {
     fn bitor(&self, other: &EferFlags) -> EferFlags {
         match (Efer::read(), other) {
             (EferFlags(flags1), &EferFlags(flags2)) => EferFlags(flags1 | flags2)
-        }
-    }
-}
-
-
-#[packed]
-struct DtReg<T> {
-    size: u16,
-    addr: *mut T,
-}
-
-impl<T> DtReg<T> {
-    pub fn new(descriptor_table: *mut T, capacity: uint) -> DtReg<T> {
-        DtReg {
-            size: (capacity * size_of::<T>() - 1) as u16,
-            addr: descriptor_table,
         }
     }
 }

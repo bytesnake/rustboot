@@ -1,7 +1,7 @@
 use core::mem::transmute;
 use core::ptr::offset;
 
-use cpu::DtReg;
+use common::x86::reg;
 use cpu::exception::Fault;
 use cpu::idt::{IdtEntry, IdtReg, INTR_GATE, PRESENT};
 use platform::drivers::pic;
@@ -24,7 +24,7 @@ impl Table {
         unsafe {
             let table = heap::zero_alloc::<IdtEntry>(256);
             let reg = heap::alloc::<IdtReg>(1);
-            *(reg as *mut IdtReg) = DtReg::new(table, 256);
+            *(reg as *mut IdtReg) = reg::DtReg::new(table, 256);
             Table {
                 reg: transmute(reg),
                 table: table,
