@@ -9,7 +9,8 @@ use kernel;
 
 pub type Frame = [u8, ..PAGE_SIZE];
 
-define_flags!(Flags: u32 {
+// 32380 => 32460 bytes!
+define_flags!(Flags: uint {
     PRESENT  = 1 << 0,
     RW       = 1 << 1,
     USER     = 1 << 2,
@@ -18,20 +19,20 @@ define_flags!(Flags: u32 {
 })
 
 #[packed]
-pub struct Page(u32);
+pub struct Page(uint);
 
 static PAGE_SIZE: uint = 0x1000;
 static PAGE_SIZE_LOG2: uint = 12;
 static ENTRIES:   uint = 1024;
 
-static DIRECTORY_VADDR: u32 = 0xFFFFF000;
-static TEMP1: u32 = 0xFF7FF000;
+static DIR_VADDR: uint = 0xFFFFF000;
+static TEMP1: uint = 0xFF7FF000;
 
 static directory_temp_tables: *mut Directory = 0xFF800000_u as *mut Directory;
 static directory_temp: *mut PageDirectory = 0xFFBFF000_u as *mut PageDirectory;
 
 static directory_tables: *mut Directory = 0xFFC00000_u as *mut Directory;
-pub static directory: *mut PageDirectory = DIRECTORY_VADDR as *mut PageDirectory;
+pub static directory: *mut PageDirectory = DIR_VADDR as *mut PageDirectory;
 
 // U: underlying element type
 #[packed]
@@ -94,7 +95,7 @@ impl Page {
     }
 
     fn at_frame(i: uint, flags: Flags) -> Page {
-        Page((i * PAGE_SIZE) as u32) | flags
+        Page(i * PAGE_SIZE) | flags
     }
 
     fn physical<P>(&self) -> Phys<P> {
