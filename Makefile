@@ -1,5 +1,6 @@
 arch=x86
-RUST_ROOT := /usr
+# RUST_ROOT := /usr
+RUST_ROOT := /home/piotr/
 LLVM_ROOT := /usr
 GCC_PREFIX := /usr/bin/
 SHELL := /bin/bash
