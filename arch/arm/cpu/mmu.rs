@@ -28,7 +28,7 @@ struct PageTableCoarse {
 
 #[allow(visible_private_types)]
 #[packed]
-struct PageDirectory {
+pub struct PageDirectory {
     entries: [Descriptor, ..4096]
 }
 
