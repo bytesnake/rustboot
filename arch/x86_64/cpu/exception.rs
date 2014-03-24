@@ -1,0 +1,21 @@
+#[repr(u8)]
+pub enum Fault {
+    DivideError = 0,
+    NMI = 2,
+    Breakpoint = 3,
+    Overflow = 4,
+    BoundExceeded = 5,
+    InvalidOpcode = 6,
+    NoMathCoprocessor = 7,
+    DoubleFault = 8,
+    CoprocessorSegmentOverun = 9,
+    InvalidTss = 10,
+    SegmentNotPresent = 11,
+    StackSegmentFault = 12,
+    GeneralProtection = 13,
+    PageFault = 14,
+    FloatingPointError = 16,
+    AlignmentCheck = 17,
+    MachineCheck = 18,
+    SimdFpException = 19,
+}
