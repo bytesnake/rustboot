@@ -88,6 +88,7 @@ pub unsafe fn init() {
 
     (*dir.as_ptr()).entries[0] = Descriptor::section(0, RW);
 
+    directory = dir.as_ptr();
     switch_directory(dir);
     enable_paging();
 }
