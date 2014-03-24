@@ -7,12 +7,25 @@
 extern crate core;
 
 #[cfg(target_arch = "x86")]
+use platform = arch::x86;
+
+#[cfg(target_arch = "x86_64")]
+use platform = self::arch::x86_64;
+#[cfg(target_arch = "x86_64")]
+pub use platform::efi;
+#[cfg(target_arch = "x86_64")]
+pub use platform::runtime;
+
+#[cfg(target_arch = "arm")]
+use platform = arch::arm;
+
+#[cfg(target_arch = "x86")]
 pub use platform::runtime::{memset, memcpy, memmove};
 #[cfg(target_arch = "arm")]
 pub use support::{memcpy, memmove};
 
 use platform::cpu;
-use kernel::util;
+pub use kernel::util;
 
 mod macros;
 
@@ -22,21 +35,28 @@ pub mod kernel;
 #[path = "rust-core/support.rs"]
 mod support;
 
-#[allow(dead_code)]
-#[cfg(target_arch = "x86")]
-#[path = "arch/x86/"]
-mod platform {
-    pub mod cpu;
-    pub mod io;
-    pub mod drivers;
-    pub mod runtime;
-}
+mod arch {
+    #[cfg(target_arch = "x86")]
+    mod x86 {
+        pub mod cpu;
+        pub mod io;
+        pub mod drivers;
+        pub mod runtime;
+    }
 
-#[allow(dead_code)]
-#[cfg(target_arch = "arm")]
-#[path = "arch/arm/"]
-mod platform {
-    pub mod cpu;
-    pub mod io;
-    pub mod drivers;
+    #[cfg(target_arch = "x86_64")]
+    pub mod x86_64 {
+        pub mod cpu;
+        pub mod io;
+        pub mod drivers;
+        pub mod runtime;
+        pub mod efi;
+    }
+
+    #[cfg(target_arch = "arm")]
+    mod arm {
+        pub mod cpu;
+        pub mod io;
+        pub mod drivers;
+    }
 }
