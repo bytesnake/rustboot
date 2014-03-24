@@ -52,7 +52,7 @@ macro_rules! impl_reg(
 
         impl_reg!($name($reg): $flags)
 
-        impl core::ops::BitOr<$flags, $flags> for CR0 {
+        impl core::ops::BitOr<$flags, $flags> for $name {
             #[inline(always)] #[allow(dead_code)]
             fn bitor(&self, other: &$flags) -> $flags {
                 match ($name::read(), other) {
