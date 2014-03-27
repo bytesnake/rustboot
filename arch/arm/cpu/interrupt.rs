@@ -1,11 +1,31 @@
 use core::mem::{volatile_store, transmute};
 use core::ptr::offset;
+use core;
 
 use kernel;
 use platform::io;
 
-static VIC_INT_ENABLE: *mut u32 = (0x10140000 + 0x010) as *mut u32;
-static UART0_IRQ: u8 = 12;
+struct PICRegisters {
+    irq_status    : IntSource, // IRQ status register
+    fiq_status    : IntSource, // FIQ status register
+    raw_intr      : IntSource, // Raw interrupt status register
+    int_select    : IntSource, // Interrupt select register
+    int_enable    : IntSource, // Interrupt enable register
+    int_en_clear  : IntSource, // Interrupt enable clear register
+    soft_int      : IntSource, // Software interrupt register
+    soft_int_clear: IntSource, // Software interrupt clear register
+    protection    : u32,       // Protection enable register
+    // ...
+}
+
+define_flags!(IntSource: u32 {
+    UART0 = 1 << 12,
+    UART1 = 1 << 13,
+    UART2 = 1 << 14
+})
+
+static PIC: *mut PICRegisters = 0x10140000 as *mut PICRegisters;
+
 static VT: *u32 = 0 as *u32;
 
 #[repr(u8)]
@@ -71,7 +91,7 @@ impl Table {
             ::: "r0", "r1", "r2", "cpsr");
 
             // enable UART0 IRQ [4]
-            *VIC_INT_ENABLE = 1 << UART0_IRQ;
+            (*PIC).int_enable = UART0;
             // enable RXIM interrupt
             *io::UART0_IMSC = 1 << 4;
         }
