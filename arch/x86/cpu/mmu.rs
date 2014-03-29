@@ -166,7 +166,7 @@ impl Table<Table<Page>> {
             }
             _ => unsafe { // allocate table
                 let table: Phys<PageTable> = physical::zero_alloc_frames(1);
-                (*directory).set_addr(vptr, table, flags); // page fault
+                self.set_addr(vptr, table, flags); // page fault
                 // flush_tlb(table);
                 table.as_ptr()
             }
