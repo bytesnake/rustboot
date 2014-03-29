@@ -4,7 +4,7 @@ use platform::io;
 use cpu::Context;
 use cpu::idt;
 use kernel::heap;
-use kernel::memory::Allocator;
+use kernel::mm::Allocator;
 
 #[repr(u8)]
 pub enum Fault {
