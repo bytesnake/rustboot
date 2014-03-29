@@ -24,6 +24,9 @@ OBJS := $(BDIR)/loader.o $(BDIR)/main.o
 LINK := $(BDIR)/linker.ld $(OBJS) $(BDIR)/initram.elf.embed
 LIBS := $(LCORE)
 
+DIETPREFIX := /home/piotr/Desktop/src/dietlibc
+LIBC := $(DIETPREFIX)/bin-i386/start.o $(DIETPREFIX)/bin-i386/dietlibc.a
+
 SECTIONS := .text .data .rodata
 
 DEP_RM := arch\/
@@ -70,10 +73,8 @@ $(BDIR)/%.o: %.asm
 
 #$(BDIR)/module.o
 $(BDIR)/initram.elf: ../../user/hello.rs $(LCORE)
-	# $(LD) $(LDFLAGS) -s $< -o $@
-	$(RUSTC) $(RUSTCFLAGS) -L $(BDIR) --emit bc ../../user/hello.rs -o $(BDIR)/initram.bc
-	$(CC) -O3 -m32 -target $(TARGET) -nostdlib -static -flto -static-libgcc -v -o $(BDIR)/initram.elf $(BDIR)/initram.bc
-	# ld -o $(BDIR)/initram.elf -nostdlib -m elf_i386 -static /opt/diet/lib-i386/libc.a $(BDIR)/initram.o
+	$(RUSTC) $(RUSTCFLAGS) -L $(BDIR) --emit=bc ../../user/hello.rs -o $(BDIR)/initram.bc
+	$(CC) -O3 -flto -m32 -target $(TARGET) -nostdlib -static -o $^ $(BDIR)/initram.bc $(LCORE) $(LIBC)
 
 $(BDIR)/%.embed: $(BDIR)/%
 	cd $(@D); $(LD) $(LDFLAGS) -r -b binary -o $(@F) $(<F)
