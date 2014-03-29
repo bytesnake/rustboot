@@ -161,6 +161,5 @@ pub fn abort() -> ! {
 
 #[no_mangle]
 #[no_split_stack]
-pub fn breakpoint() -> ! {
-    loop {}
+pub fn breakpoint() {
 }
