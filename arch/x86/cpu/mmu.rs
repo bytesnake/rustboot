@@ -189,7 +189,9 @@ impl Table<Table<Page>> {
         unsafe {
             let end = mut_offset(page_ptr, len as int);
             while page_ptr < end {
-                self.map_frame(page_ptr, flags);
+                let frame = physical::alloc_frames(1);
+                self.set_page(page_ptr, frame, flags | PRESENT);
+                (*directory).set_page(page_ptr, frame, flags | PRESENT);
                 page_ptr = mut_offset(page_ptr, PAGE_SIZE as int);
             }
         }
