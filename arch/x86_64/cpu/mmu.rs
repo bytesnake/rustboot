@@ -47,8 +47,8 @@ struct Directory<U = PageTable> {
     entries: [U, ..ENTRIES]
 }
 
-pub type PageTable = Table<Page>;
-pub type PageDirectory = Table<Table<Page>>;
+pub type PageTable = Table<Descriptor>;
+pub type PageDirectory = Table<Table<Descriptor>>;
 
 pub unsafe fn init() {
     let dir: Phys<PageDirectory> = physical::zero_alloc_frames(1);
@@ -136,6 +136,9 @@ impl<U> Table<U> {
         // update entry, based on the underlying type (page, table)
         let size = size_of::<U>() / size_of::<Page>() * PAGE_SIZE;
         let index = (addr as uint / size) % ENTRIES;
+        // putx(addr as uint);
+        // putx(size);
+        // putx(index);
         self.entries[index] = page;
     }
 
@@ -146,16 +149,20 @@ impl<U> Table<U> {
     }
 }
 
-impl Table<Page> {
+impl Table<Descriptor> {
     fn identity_map(&mut self, start: uint, flags: Flags) {
         range(0, ENTRIES, |i| {
             self.entries[i] = Page::at_frame(start + i, flags);
         });
     }
+
+    // fn len(&self) {
+    //     1
+    // }
 }
 
 // Can't impl on typedefs. Rust #9767
-impl Table<Table<Page>> {
+impl Table<Table<Descriptor>> {
     fn fetch_table(&mut self, addr: u32, flags: Flags) -> *mut PageTable {
         match self.get(addr) {
             table @ Page(_) if table.present() => {
@@ -187,11 +194,15 @@ impl Table<Table<Page>> {
         CR3::write(self);
         CR0::write(CR0 | CR0_PG);
     }
+
+    // fn len(&self) {
+    //     1024
+    // }
 }
 
 impl Clone for Table<Table<Page>> {
     #[inline(always)]
-    fn clone(&self) -> Table<Table<Page>> {
+    fn clone(&self) -> Table<Table<Descriptor>> {
         unsafe {
             // new directory
             let dir_phys: Phys<PageDirectory> = physical::zero_alloc_frames(1);
@@ -213,9 +224,9 @@ impl Clone for Table<Table<Page>> {
     }
 }
 
-impl DeepClone for Table<Table<Page>> {
+impl DeepClone for Table<Table<Descriptor>> {
     #[inline(always)]
-    fn deep_clone(&self) -> Table<Table<Page>> {
+    fn deep_clone(&self) -> Table<Table<Descriptor>> {
         *self
     }
 }

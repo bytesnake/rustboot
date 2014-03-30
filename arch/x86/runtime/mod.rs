@@ -1,9 +1,12 @@
+// use core::mem::transmute;
 use core::cmp::expect;
 use core::ptr::offset;
 use core::c_types::c_int;
 
 use util::int::range;
 use util::ptr::mut_offset;
+use util::int::range;
+use kernel;
 
 mod stack;
 
@@ -94,6 +97,14 @@ fn dmemset(s: *mut u8, c: u32, n: uint) {
 
     stosd(s, c, n);
 }
+/*
+fn dqamemset(s: *mut u8, c: u32, n: uint) {
+    if unlikely!(n == 0) {
+        return;
+    }
+
+    stosd(s, c, n);
+}*/
 
 pub fn sse2_dmem_movdqa_add(mut dest: *mut u8, c: u32, inc: u32, n: uint) {
     unsafe {
@@ -125,7 +136,6 @@ pub fn memset(s: *mut u8, c: c_int, n: int) {
     memset_nonzero(s, (c & 0xFF) as u8, n as uint);
 }
 
-#[allow(dead_assignment)]
 #[no_mangle]
 pub fn memcpy(dest: *mut u8, src: *u8, mut n: uint) {
     if unlikely!(n == 0) {

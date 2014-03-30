@@ -19,6 +19,7 @@ QEMU := qemu-system-i386
 BDIR := ./boot
 CORE_LIB := ../../rust-core/core/lib.rs
 LCORE := $(BDIR)/$(shell $(RUSTC) --crate-file-name $(CORE_LIB))
+LMACRO := $(BDIR)/$(shell $(RUSTC) --crate-file-name ../../asm_ext.rs)
 OBJS := $(BDIR)/loader.o $(BDIR)/main.o
 LINK := $(BDIR)/linker.ld $(OBJS) $(BDIR)/initram.elf.embed
 LIBS := $(LCORE)
@@ -45,11 +46,15 @@ $(LCORE): $(CORE_LIB)
 
 # Compile rustboot. Produce dependency info
 $(BDIR)/main.bc: ../../lib.rs $(LCORE)
-	$(RUSTC) $(RUSTCFLAGS) --dep-info -L $(BDIR) --emit bc ../../lib.rs --out-dir $(BDIR)
+	$(RUSTC) $(RUSTCFLAGS) --dep-info -L $(BDIR) --emit=bc ../../lib.rs --out-dir $(BDIR)
 	@sed -i $(DEP_SCRIPT) $(BDIR)/main.d
 
 %.o: %.bc
 	$(CC) $(CFLAGS) -c $^ -o $@
+
+# asm ext
+$(LMACRO): ../../asm_ext.rs
+	$(RUSTC) --crate-type=rlib -O -Z no-landing-pads -g $^ --out-dir $(BDIR)
 
 # Assemble loader
 %.o: %.asm
@@ -63,8 +68,12 @@ $(BDIR)/kernel.elf: $(LINK)
 $(BDIR)/%.o: %.asm
 	$(ASM) $(ASMFLAGS) -MD $(BDIR)/$*.d -o $@ $<
 
-$(BDIR)/initram.elf: $(BDIR)/module.o
-	$(LD) $(LDFLAGS) -s $< -o $@
+#$(BDIR)/module.o
+$(BDIR)/initram.elf: ../../user/hello.rs $(LCORE)
+	# $(LD) $(LDFLAGS) -s $< -o $@
+	$(RUSTC) $(RUSTCFLAGS) -L $(BDIR) --emit bc ../../user/hello.rs -o $(BDIR)/initram.bc
+	$(CC) -O3 -m32 -target $(TARGET) -nostdlib -static -flto -static-libgcc -v -o $(BDIR)/initram.elf $(BDIR)/initram.bc
+	# ld -o $(BDIR)/initram.elf -nostdlib -m elf_i386 -static /opt/diet/lib-i386/libc.a $(BDIR)/initram.o
 
 $(BDIR)/%.embed: $(BDIR)/%
 	cd $(@D); $(LD) $(LDFLAGS) -r -b binary -o $(@F) $(<F)

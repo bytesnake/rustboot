@@ -1,9 +1,15 @@
 use core::mem::size_of;
+use core::mem::uninit;
 use core::option::{Option, None, Some};
+use core::slice::Slice;
 use core;
 
+use io::puts;
+use util::rt;
+use util::ptr::mut_offset;
 use kernel::heap;
 use kernel;
+// use vec::Vec;
 
 mod gdt;
 mod idt;
@@ -13,6 +19,35 @@ pub mod io;
 mod exception;
 pub mod mmu;
 
+macro_rules! cpuid(
+    ($n:expr, $s1:expr, $s2:expr, $s3:expr, $s4:expr) => (
+        asm!("cpuid"
+            : "=A"($s1),
+              "={ebx}"($s2),
+              "={edx}"($s3),
+              "={ecx}"($s4)
+            : "A"($n) :: "intel");
+    );
+    ($n:expr, *$s1:expr) => (
+        cpuid!($n, (*$s1)[0], (*$s1)[1], (*$s1)[2], (*$s1)[3]);
+    );
+    ($e:expr) => (
+        {
+            let mut eax: u32 = $e as u32;
+            let ebx: u32;
+            let ecx: u32;
+            let edx: u32;
+            asm!("cpuid"
+                : "+A"(eax), "={ebx}"(ebx), "={edx}"(edx), "={ecx}"(ecx)
+                ::: "intel")
+            (eax, ebx, edx, ecx)
+        }
+    );
+)
+
+// TODO: apic
+
+// call TrapFrame / TrapCallStack?
 // TODO: make push_dummy push ds?
 // exception info and processor state saved on stack
 struct Context {
@@ -51,10 +86,51 @@ impl Context {
               iretd"
             :::: "volatile", "intel");
     }
+
+    unsafe fn switch(&self, data_desc: u16, tss_desc: u16) { //-> ! {
+        // TODO: ensure is pushed
+        // use platform::runtime;
+        rt::breakpoint();
+        // let call_stack = self.call_stack; //uninit()
+        asm!("//mov eax, $0
+              // ctx.ss: stack (data) descriptor
+              //push dword (7 shl 3) + 3
+              // ctx.call_stack.esp: stack pointer
+              //push eax
+              // ctx.eflags
+              //pushf
+              // ctx.eflags |= IF (user interrupt enable: sti)
+              //or dword[ss:esp], 200h
+              //mov eax, dword[ss:esp]
+              //or eax, 200h
+              //mov dword[TSS.START + 9*4], 0x3202
+              // ; code descriptor
+              // push dword (6 shl 3) + 3
+              // push ring3
+
+              // load TSS
+              // mov ax, (3 shl 3) ;+3
+              ltr $1 // ref http://www.rz.uni-karlsruhe.de/rz/docs/VTune/reference/
+
+              // mov ax, (7 shl 3) + 3
+              mov ds, $0
+              mov es, $0
+              mov fs, $0
+              mov gs, $0
+
+              iretd" // http://faydoc.tripod.com/cpu/iretd.htm
+            :: "r"(data_desc), "r"(tss_desc), "{esp}"(&self.call_stack) // could it work?
+            : "ax" : "volatile", "intel")
+        // which clobber
+        // ctx.useresp vs ctx.esp??
+        // forget(tmp);
+    }
 }
 
 struct LocalSegment {
     ts: tss::TssEntry,
+    // &cpu info
+    // &proc
 }
 
 pub static mut desc_table: Option<gdt::Gdt> = None;
@@ -92,8 +168,16 @@ pub fn init() {
         });
 
         mmu::init();
+
+        let ctx = heap::malloc_raw(size_of::<Context>()) as *Context;
+        // (*ctx).switch((5 << 3) + 3, (3 << 3));
     }
 }
 
 pub fn info() {
+    unsafe {
+        use io;
+        let (a, _, _, _) = cpuid!(0);
+        io::puti(a as int);
+    }
 }

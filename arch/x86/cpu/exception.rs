@@ -65,7 +65,7 @@ unsafe fn blue_screen(stack: &Context) {
 pub unsafe fn exception_handler() -> extern "C" unsafe fn() {
     asm!("jmp skip_exception_handler
       exception_handler_asm:"
-        :::: "volatile", "intel");
+        ::: "volatile" : "eax", "volatile", "intel")
 
     // Points to the data on the stack
     let stack_ptr = Context::save();
@@ -88,7 +88,7 @@ pub unsafe fn exception_handler() -> extern "C" unsafe fn() {
     Context::restore();
 
     asm!("skip_exception_handler:"
-        :::: "volatile", "intel");
+        :::: "volatile", "intel")
 
     extern { fn exception_handler_asm(); }
     exception_handler_asm

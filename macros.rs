@@ -57,6 +57,8 @@ macro_rules! define_flags (
         define_flags_rec!($name, 1, $( $flag $(= $v)* ),+)
     };
 )
+
+// Rust: nested macros? transcriber : macro_rule | ...
 macro_rules! define_flags_rec (
     // full list (original behavior)
     (
@@ -86,6 +88,16 @@ macro_rules! define_flags_rec (
         pub static $flag: $name = $name($value);
     );
     // ----------
+    // without value (default) shift
+    /*(
+        $name:ident,
+        $default:expr << $shift:expr,
+        $flag:ident,
+        $($f:ident $(= $v:expr)*),*
+    ) => (
+        pub static $flag: $name = $name($default << $shift);
+        define_fields_rec!($name, $default << ($shift + 1), $($f $(= $v)*),+)
+    );*/
     // without value (default)
     (
         $name:ident,
@@ -97,6 +109,16 @@ macro_rules! define_flags_rec (
         pub static $flag: $name = $name($default);
         define_flags_rec!($name, $default << 1, $($f $(= $v)*),+)
     );
+    // one with shift
+    /*(
+        $name:ident,
+        $default:expr,
+        $flag:ident = $($($val:expr)<<+ $shift:expr),+
+        $($f:ident = $v:expr),*
+    ) => (
+        pub static $flag: $name = $name($value << $shift);
+        define_fields_rec!($name, $value << (1 + $shift), $($flag = $value),+)
+    );*/
     // with value
     (
         $name:ident,
@@ -157,4 +179,11 @@ macro_rules! impl_ops (
             }
         }
     )
+)
+
+macro_rules! asmv(
+    (
+        //( ( $param:stmt ),* ):*
+        $e:expr
+    ) => (asm!($e :::: "volatile", "intel"))
 )

@@ -1,5 +1,8 @@
 use core::option::{Option, None};
+use core::mem::transmute;
 
+use io::puti;
+use cpu::interrupt::{interrupt_handler, Isr, Int};
 use kernel;
 pub mod pic;
 pub mod vga;
@@ -14,6 +17,7 @@ pub fn init() {
     unsafe {
         kernel::int_table.map(|mut t| {
             t.enable_maskable(keyboard::IRQ, keyboard::isr_addr());
+            t.set_intr_gate(0x80, Isr::new(transmute(0x80u8), false));
         });
     }
 }

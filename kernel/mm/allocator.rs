@@ -1,6 +1,7 @@
 use core::mem::transmute;
 use core::ptr::{set_memory, copy_memory, offset};
 use core::i32::ctlz32;
+use core::cmp::expect;
 
 use util::ptr::mut_offset;
 use util::bitv::Bitv;
@@ -12,6 +13,9 @@ enum Node {
     SPLIT = 2,
     FULL = 3
 }
+
+#[path = "../../rust-core/macros.rs"]
+mod macros;
 
 pub trait Allocator {
     fn alloc(&mut self, size: uint) -> (*mut u8, uint);

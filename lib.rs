@@ -27,6 +27,15 @@ pub use support::{memcpy, memmove};
 use platform::cpu;
 use arch::common;
 pub use kernel::util;
+// visibility trick
+// use core::{fail, mem, clone, cmp, ops, option, slice, container, iter, ptr, uint};
+// pub mod heap {
+//     pub use kernel::{malloc_raw, free, realloc_raw};
+// }
+// #[path = "rust-core/core/heap_closure.rs"]
+// pub mod heap_closure;
+// #[path = "rust-core/core/vec.rs"]
+// pub mod vec;
 
 mod macros;
 

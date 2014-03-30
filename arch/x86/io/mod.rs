@@ -16,12 +16,12 @@ unsafe fn write_char(c: char) {
     if c == '\x08' {
         if pos > 0 {
             if pos % 80 == 0 {
-                while (*vga::SCREEN)[pos-1].char == 0 {
+                while (*vga::SCREEN)[pos].char == 0 {
                     pos -= 1;
                 }
             }
             else if pos > 0 {
-                if pos > 0 { pos -= 1; }
+                pos -= 1;
                 (*vga::SCREEN)[pos].char = 0;
             }
         }

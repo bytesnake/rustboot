@@ -7,7 +7,17 @@ It paints the screen bright red and then displays some information. You can writ
 ![][x86_run]
 
 ![][arm_dbg]
-
+@adridu59 you are right. The grammar of the `use` statement was not updated in the manual ([6.1.2.1.2 Use declarations](http://static.rust-lang.org/doc/master/rust.html#use-declarations)). It's now:
+```
+use_decl : "pub" ? "use" [ ident '=' path
+                          | path_glob ] ;
+```
+I propose the following:
+```
+use_decl : "pub" ? "use" "extern" ? [ ident '=' path
+                          | path_glob ] ;
+```
+Even though `extern` is repeated in every `use` statement, However, 
 ## Setup
 
 You need a few things to run rustboot:
