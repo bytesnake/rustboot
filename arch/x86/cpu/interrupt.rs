@@ -126,8 +126,7 @@ pub unsafe fn interrupt_handler() -> extern "C" unsafe fn() {
 
     let stack_ptr = Context::save();
 
-    let mut args = syscall::args(stack_ptr.eax, stack_ptr.ebx, stack_ptr.ecx, stack_ptr.edx);
-    stack_ptr.eax = syscall::handler(&mut args);
+    syscall::handler(stack_ptr);
 
     Context::restore();
 
