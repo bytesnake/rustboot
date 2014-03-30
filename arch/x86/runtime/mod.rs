@@ -2,6 +2,7 @@ use core::cmp::expect;
 use core::ptr::offset;
 use core::c_types::c_int;
 
+use util::int::range;
 use util::ptr::mut_offset;
 
 mod stack;
