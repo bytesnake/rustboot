@@ -73,7 +73,7 @@ $(BDIR)/%.o: %.asm
 	@$(MAKE) all -C ../../user/ CFLAGS="-m32 -target $(TARGET)" RUSTCFLAGS="$(RUSTCFLAGS) -L ../arch/x86/$(BDIR)" SHELL=$(SHELL)
 
 $(BDIR)/initram.elf: ../../user/hello.elf
-	$(OBJCOPY) $^ $@ -S -g
+	$(OBJCOPY) -S -g --strip-unneeded $^ $@
 
 $(BDIR)/%.embed: $(BDIR)/initram.elf
 	cd $(@D); $(LD) $(LDFLAGS) -r -b binary -o $(@F) $(<F)
