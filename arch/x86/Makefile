@@ -24,9 +24,6 @@ OBJS := $(BDIR)/loader.o $(BDIR)/main.o
 LINK := $(BDIR)/linker.ld $(OBJS) $(BDIR)/initram.elf.embed
 LIBS := $(LCORE)
 
-DIETPREFIX := /home/piotr/Desktop/src/dietlibc
-LIBC := $(DIETPREFIX)/bin-i386/start.o $(DIETPREFIX)/bin-i386/dietlibc.a
-
 SECTIONS := .text .data .rodata
 
 DEP_RM := arch\/
@@ -73,10 +70,12 @@ $(BDIR)/%.o: %.asm
 
 #$(BDIR)/module.o
 $(BDIR)/initram.elf: ../../user/hello.rs $(LCORE)
-	$(RUSTC) $(RUSTCFLAGS) -L $(BDIR) --emit=bc ../../user/hello.rs -o $(BDIR)/initram.bc
-	$(CC) -O3 -flto -m32 -target $(TARGET) -nostdlib -static -o $^ $(BDIR)/initram.bc $(LCORE) $(LIBC)
+	@$(MAKE) all -C ../../user/ CFLAGS="-m32 -target $(TARGET)" RUSTCFLAGS="$(RUSTCFLAGS) -L ../arch/x86/$(BDIR)" SHELL=$(SHELL)
+	cp ../../user/hello.elf $(BDIR)/initram.elf
+	# $(RUSTC) $(RUSTCFLAGS) -L $(BDIR) --emit=bc ../../user/hello.rs -o $(BDIR)/initram.bc
+	# $(CC) -O3 -flto -m32 -target $(TARGET) -nodefaultlibs -static -v -L$(BDIR) -L/usr/lib32 -o $@ $(BDIR)/initram.bc $(LCORE) -ldl -lc -lgcc_eh -lgcc -lm -lclang_rt.full-i386 -ldl # -lgcc #$(LIBC)
 
-$(BDIR)/%.embed: $(BDIR)/%
+$(BDIR)/%.embed: $(BDIR)/initram.elf
 	cd $(@D); $(LD) $(LDFLAGS) -r -b binary -o $(@F) $(<F)
 
 # bootloader and kernel separately
