@@ -3,9 +3,6 @@ use core::ptr::offset;
 
 use util::ptr::mut_offset;
 
-#[path = "../../../rust-core/macros.rs"]
-mod macros;
-
 type c_int = i32;
 
 // TODO: use SSE

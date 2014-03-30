@@ -14,9 +14,6 @@ enum Node {
     FULL = 3
 }
 
-#[path = "../../rust-core/macros.rs"]
-mod macros;
-
 pub trait Allocator {
     fn alloc(&mut self, size: uint) -> (*mut u8, uint);
 
