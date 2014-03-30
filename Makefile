@@ -15,4 +15,5 @@ all:
 	@$(MAKE) all -C arch/$(arch)/ SHELL=$(SHELL)
 
 %:
+	@$(MAKE) $* -C user/ SHELL=$(SHELL)
 	@$(MAKE) $* -C arch/$(arch)/ SHELL=$(SHELL)
