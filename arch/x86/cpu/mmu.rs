@@ -1,4 +1,5 @@
 use core::mem::{transmute, size_of};
+use core::ptr::{copy_nonoverlapping_memory, offset};
 use core::clone::{Clone, DeepClone};
 use core;
 
@@ -58,7 +59,7 @@ pub unsafe fn init() {
 
     // Map the directory as its own last table.
     // When accessing its virtual address(...)
-    (*dir.as_ptr()).set_addr(directory, dir, PRESENT | RW);
+    (*dir.as_ptr()).map_self(dir);
 
     kernel::int_table.map(|mut t| {
         use super::exception::{PageFault, exception_handler};
@@ -197,57 +198,22 @@ impl Table<Table<Page>> {
         }
     }
 
-    // fn map_self
+    fn map_self(&mut self, this: Phys<PageDirectory>) {
+        self.set(directory as uint, Page::new(this, PRESENT | RW));
+    }
 
-    pub fn clone(&self) -> *mut Table<Table<Page>> {
+    pub fn clone(&self) -> Phys<PageDirectory> {
         unsafe {
             // new directory
             let dir_phys: Phys<PageDirectory> = physical::zero_alloc_frames(1);
-            let dir_temp = (*directory).set_page(transmute(TEMP1), dir_phys, PRESENT | RW | USER);
+            let dir_temp = (*directory).set_page(transmute(TEMP1), dir_phys, PRESENT | RW);
 
-            rt::breakpoint();
-            (*dir_temp).set(directory as uint, Page::new(dir_phys, PRESENT | RW));
-            (*dir_temp).set(0, self.get(0));
+            (*dir_temp).map_self(dir_phys);
 
-            let mut i = (ENTRIES * PAGE_SIZE) as uint;
-            while i < 0xC0000000 {
-                (*dir_temp).set(i, self.get(i));
+            let cnt = 0xC0000000 / (ENTRIES * PAGE_SIZE);
+            copy_nonoverlapping_memory(dir_temp as *mut Page, &self.entries as *Page, cnt);
 
-                i += PAGE_SIZE as uint;
-            }
-
-            dir_phys.as_ptr()
+            dir_phys
         }
     }
 }
-
-// impl Clone for Table<Table<Page>> {
-//     #[inline(always)]
-//     fn clone(&self) -> Table<Table<Page>> {
-//         unsafe {
-//             // new directory
-//             let dir_phys: Phys<PageDirectory> = physical::zero_alloc_frames(1);
-//             let dir_temp = (*directory).set_page(transmute(TEMP1), dir_phys, PRESENT | RW | USER);
-
-//             rt::breakpoint();
-//             (*dir_temp).set(directory as uint, Page::new(dir_phys, PRESENT | RW));
-//             (*dir_temp).set(0, self.get(0));
-
-//             let mut i = (ENTRIES * PAGE_SIZE) as uint;
-//             while i < 0xC0000000 {
-//                 (*dir_temp).set(i, self.get(i));
-
-//                 i += PAGE_SIZE as uint;
-//             }
-
-//             *dir_phys.as_ptr()
-//         }
-//     }
-// }
-
-// impl DeepClone for Table<Table<Page>> {
-//     #[inline(always)]
-//     fn deep_clone(&self) -> Table<Table<Page>> {
-//         *self
-//     }
-// }
