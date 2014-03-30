@@ -14,12 +14,10 @@ LIBS := -Wl,--start-group -lc -Wl,--end-group $(LIBCDIR)/crtn.o
 all: hello.elf
 
 %.bc: %.rs
-	echo $(RUSTCFLAGS)
 	$(RUSTC) $(RUSTCFLAGS) --emit=bc $^
 
 %.elf: %.bc
 	$(CC) $(UCFLAGS) -L$(LIBCDIR) -o $@ $^ $(LIBS)
-	# $(OBJCOPY) $@ -S -g
 
 run:
 

@@ -69,11 +69,11 @@ $(BDIR)/%.o: %.asm
 	$(ASM) $(ASMFLAGS) -MD $(BDIR)/$*.d -o $@ $<
 
 #$(BDIR)/module.o
-$(BDIR)/initram.elf: ../../user/hello.rs $(LCORE)
+../../user/hello.elf: ../../user/hello.rs $(LCORE)
 	@$(MAKE) all -C ../../user/ CFLAGS="-m32 -target $(TARGET)" RUSTCFLAGS="$(RUSTCFLAGS) -L ../arch/x86/$(BDIR)" SHELL=$(SHELL)
-	cp ../../user/hello.elf $(BDIR)/initram.elf
-	# $(RUSTC) $(RUSTCFLAGS) -L $(BDIR) --emit=bc ../../user/hello.rs -o $(BDIR)/initram.bc
-	# $(CC) -O3 -flto -m32 -target $(TARGET) -nodefaultlibs -static -v -L$(BDIR) -L/usr/lib32 -o $@ $(BDIR)/initram.bc $(LCORE) -ldl -lc -lgcc_eh -lgcc -lm -lclang_rt.full-i386 -ldl # -lgcc #$(LIBC)
+
+$(BDIR)/initram.elf: ../../user/hello.elf
+	$(OBJCOPY) $^ $@ -S -g
 
 $(BDIR)/%.embed: $(BDIR)/initram.elf
 	cd $(@D); $(LD) $(LDFLAGS) -r -b binary -o $(@F) $(<F)
@@ -93,7 +93,7 @@ $(BDIR)/floppy.img: $(BDIR)/boot.bin $(BDIR)/kernel.bin
 run: all
 	$(QEMU) -fda $(BDIR)/floppy.img
 
-debug: $(BDIR)/kernel.elf $(BDIR)/floppy.img
+debug: $(BDIR)/kernel.elf ../../user/hello.elf $(BDIR)/floppy.img
 ifeq ($(strip $(TMUX)),)
 	tmux new-session -d -s rustboot "$(QEMU) -fda $(BDIR)/floppy.img -m 32 -s -S"
 	tmux new-window -t rustboot:1 "$(GDB)"
