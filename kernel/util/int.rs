@@ -21,8 +21,8 @@ pub fn to_str_bytes(num: $T, radix: uint, f: |u8|) {
     let mut cur = 0;
 
     // TODO: test overflow
-    let mut deccum = num / radix as $T;
     let mut digit = num % radix as $T;
+    let mut deccum = num / radix as $T;
 
     // Calculate the absolute value after dividing the whole number once,
     // because a U2 representable negative number doesn't necessarily have
@@ -39,9 +39,9 @@ pub fn to_str_bytes(num: $T, radix: uint, f: |u8|) {
             i        => 'a' as u8 + (i-10),
         };
         cur += 1;
-        deccum /= radix as $T;
         if deccum == 0 { break; }
         digit = deccum % radix as $T;
+        deccum /= radix as $T;
     }
 
     if neg {
