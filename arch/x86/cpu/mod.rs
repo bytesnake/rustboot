@@ -4,6 +4,7 @@ use core::option::{Option, None, Some};
 use core::slice::Slice;
 use core;
 
+pub use self::idt::IdtEntry;
 use io::puts;
 use util::rt;
 use util::ptr::mut_offset;
@@ -50,7 +51,7 @@ macro_rules! cpuid(
 // call TrapFrame / TrapCallStack?
 // TODO: make push_dummy push ds?
 // exception info and processor state saved on stack
-struct Context {
+pub struct Context {
     // Registers saved by the ISR (in reverse order)
     edi: u32, esi: u32, ebp: u32, esp: u32, ebx: u32, edx: u32, ecx: u32, eax: u32,
     ds: u32, es: u32, fs: u32, gs: u32,
