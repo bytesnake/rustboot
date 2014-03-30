@@ -5,7 +5,6 @@ use core::slice::Slice;
 use core;
 
 pub use self::idt::IdtEntry;
-use io::puts;
 use util::rt;
 use util::ptr::mut_offset;
 use kernel::heap;
@@ -177,7 +176,7 @@ pub fn init() {
 
 pub fn info() {
     unsafe {
-        use io;
+        use platform::io;
         let (a, _, _, _) = cpuid!(0);
         io::puti(a as int);
     }

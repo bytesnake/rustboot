@@ -1,7 +1,6 @@
 use core::option::{Option, None};
 use core::mem::transmute;
 
-use io::puti;
 use cpu::interrupt::{interrupt_handler, Isr, Int};
 use kernel;
 pub mod pic;
