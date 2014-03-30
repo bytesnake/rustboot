@@ -1,3 +1,6 @@
+use core::slice;
+use core::mem::transmute;
+
 use platform = arch::x86;
 use cpu::Context;
 
@@ -53,6 +56,9 @@ pub fn handler(ctx: &mut Context) {
         3 => {
             read(ctx)
         }
+        4 => {
+            write(ctx)
+        }
         5 => {
             open(ctx)
         }
@@ -88,6 +94,13 @@ syscall!(fn exit(error_code: int) -> uint {
 
 syscall!(fn read(fd: uint, buf: *u8, count: uint) -> uint {
     0
+})
+
+syscall!(fn write(fd: uint, buf: *u8, count: uint) -> uint {
+    unsafe {
+        platform::io::puts(transmute(slice::Slice { data: buf, len: count }));
+    }
+    count
 })
 
 syscall!(fn open(filename: *u8, flags: int, mode: uint) -> uint {
