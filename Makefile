@@ -1,4 +1,4 @@
-arch=x86
+arch=i686
 # RUST_ROOT := /usr
 RUST_ROOT := /home/piotr/
 LLVM_ROOT := /usr

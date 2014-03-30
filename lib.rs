@@ -7,7 +7,7 @@
 extern crate core;
 
 #[cfg(target_arch = "x86")]
-use platform = arch::x86;
+use platform = arch::i686;
 
 #[cfg(target_arch = "x86_64")]
 use platform = self::arch::x86_64;
@@ -49,7 +49,7 @@ mod arch {
     pub mod common;
 
     #[cfg(target_arch = "x86")]
-    pub mod x86 {
+    pub mod i686 {
         pub mod cpu;
         pub mod io;
         pub mod drivers;

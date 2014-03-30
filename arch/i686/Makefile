@@ -16,7 +16,7 @@ GDB := $(GCC_PREFIX)gdb
 OBJCOPY := $(GCC_PREFIX)objcopy
 QEMU := qemu-system-i386
 
-BDIR := ./boot
+BDIR := ./floppy
 CORE_LIB := ../../rust-core/core/lib.rs
 LCORE := $(BDIR)/$(shell $(RUSTC) --crate-file-name $(CORE_LIB))
 LMACRO := $(BDIR)/$(shell $(RUSTC) --crate-file-name ../../asm_ext.rs)
@@ -70,7 +70,7 @@ $(BDIR)/%.o: %.asm
 
 #$(BDIR)/module.o
 ../../user/hello.elf: ../../user/hello.rs $(LCORE)
-	@$(MAKE) all -C ../../user/ CFLAGS="-m32 -target $(TARGET)" RUSTCFLAGS="$(RUSTCFLAGS) -L ../arch/x86/$(BDIR)" SHELL=$(SHELL)
+	@$(MAKE) all -C ../../user/ CFLAGS="-m32 -target $(TARGET)" RUSTCFLAGS="$(RUSTCFLAGS) -L ../arch/i686/$(BDIR)" SHELL=$(SHELL)
 
 $(BDIR)/initram.elf: ../../user/hello.elf
 	$(OBJCOPY) -S -g --strip-unneeded $^ $@

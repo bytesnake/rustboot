@@ -1,7 +1,7 @@
 use core::slice;
 use core::mem::transmute;
 
-use platform = arch::x86;
+use platform = arch::i686;
 use cpu::Context;
 
 pub struct args(u32, u32, u32, u32);
