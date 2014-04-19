@@ -29,6 +29,7 @@ mod platform {
     pub mod cpu;
     pub mod io;
     pub mod drivers;
+    pub mod smp;
     pub mod runtime;
 }
 
