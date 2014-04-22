@@ -1,4 +1,7 @@
 pub mod info;
 
-fn init() {
+pub fn init() {
+	unsafe {
+		info::init();
+	}
 }

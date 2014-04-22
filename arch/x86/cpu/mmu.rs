@@ -24,6 +24,8 @@ static PAGE_SIZE: uint = 0x1000;
 static PAGE_SIZE_LOG2: uint = 12;
 static ENTRIES:   uint = 1024;
 
+pub static BASE_VADDR: u32 = 0x80000000;
+
 static DIRECTORY_VADDR: u32 = 0xFFFFF000;
 static TEMP1: u32 = 0xFF7FF000;
 
@@ -48,11 +50,13 @@ pub type PageTable = Table<Page>;
 pub type PageDirectory = Table<Table<Page>>;
 
 pub unsafe fn init() {
+    let kernel: Phys<[u8, ..0x100000]> = Phys::at(0);
     let dir: Phys<PageDirectory> = physical::zero_alloc_frames(1);
     let table: Phys<PageTable>   = physical::alloc_frames(1);
 
     (*table.as_ptr()).identity_map(0, PRESENT | RW);
     (*dir.as_ptr()).set_addr(0 as *mut u8, table, PRESENT | RW);
+    (*dir.as_ptr()).set_addr(BASE_VADDR as *mut [u8, ..0x100000], kernel, PRESENT | RW);
 
     // Map the directory as its own last table.
     // When accessing its virtual address(...)

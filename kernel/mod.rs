@@ -1,6 +1,6 @@
 use core::option::{Option, Some, None};
 
-use platform::{cpu, io, drivers};
+use platform::{cpu, io, drivers, smp};
 use cpu::interrupt;
 pub use cpu::interrupt::Table;
 
@@ -28,6 +28,9 @@ pub fn main() {
     cpu::init();
 
     drivers::init();
+
+    smp::init();
+
     elf::exec(&_binary_initram_elf_start);
     extern { static _binary_initram_elf_start: u8; }
 }

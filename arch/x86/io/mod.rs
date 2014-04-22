@@ -52,6 +52,12 @@ pub fn puti(num: int) {
     });
 }
 
+pub fn putx(num: int) {
+    int::to_str_bytes(num, 16, |n| {
+        putc(n);
+    });
+}
+
 pub fn puts(s: &str) {
     for c in slice::iter(str::as_bytes(s)) {
         putc(*c);

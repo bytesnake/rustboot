@@ -82,7 +82,7 @@ $(BDIR)/floppy.img: $(BDIR)/boot.bin $(BDIR)/kernel.bin
 
 # running
 run: all
-	$(QEMU) -fda $(BDIR)/floppy.img
+	$(QEMU) -smp 2 -fda $(BDIR)/floppy.img
 
 debug: $(BDIR)/kernel.elf $(BDIR)/floppy.img
 ifeq ($(strip $(TMUX)),)
